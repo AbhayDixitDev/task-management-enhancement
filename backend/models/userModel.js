@@ -1,4 +1,4 @@
-const mongoose = require ('mongoose')
+const mongoose = require('mongoose')
 
 const userSchema = mongoose.Schema({
     name: {
@@ -22,6 +22,18 @@ const userSchema = mongoose.Schema({
     task:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Task',        
+    },
+    department: {
+        type: String,
+        required: true
+    },
+    position: {
+        type: String,
+        required: true
+    },
+    manager: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 }, {
     timestamps: true

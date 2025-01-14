@@ -5,8 +5,18 @@ const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 
 dotenv.config()
-
-app.use(cors())
+try {
+mongoose.connect(process.env.MONGO_URL)
+    
+} catch (error) {
+    console.log(error);
+    
+}
+app.use(cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "X-HTTP-Method-Override", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods", "Access-Control-Allow-Credentials"]
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
