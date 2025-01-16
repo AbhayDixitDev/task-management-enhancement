@@ -4,9 +4,10 @@ const adminController = require("../controllers/adminController")
 
 router.post("/createUser",adminController.CreateUser)
 router.post("/adminLogin",adminController.AdminLogin)
-router.get("/showUsers",adminController.showUsers)
-router.delete("/deleteUser/:id",adminController.deleteUser)
-router.get("/fetchUser/:id",adminController.fetchUser)
-router.put("/editUser/:id",adminController.editUser)
+router.get("/showUsers",adminController.ShowUsers)
+router.delete("/deleteUser/:id",adminController.DeleteUser)
+router.get("/fetchUser/:id",adminController.FetchUser)
+router.put("/editUser/:id",adminController.EditUser)
+router.post("/assignTask",adminController.AssignTask)
 
 module.exports = router

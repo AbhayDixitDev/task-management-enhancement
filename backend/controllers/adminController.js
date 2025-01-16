@@ -37,7 +37,7 @@ const CreateUser= async(req, res) => {
     }
 }
 
-const showUsers = async(req, res) => {
+const ShowUsers = async(req, res) => {
     try {
         
         let users = await Employee.find()
@@ -48,7 +48,7 @@ const showUsers = async(req, res) => {
     }
 }
 
-const deleteUser = async(req, res) => {
+const DeleteUser = async(req, res) => {
     const { id } = req.params
     try {
         const user = await Employee.findByIdAndDelete(id)
@@ -60,7 +60,7 @@ const deleteUser = async(req, res) => {
     }
 }
 
-const fetchUser = async(req, res) => {
+const FetchUser = async(req, res) => {
     const { id } = req.params
     try {
         const user = await Employee.findById(id)
@@ -70,7 +70,7 @@ const fetchUser = async(req, res) => {
     }
 }
 
-const editUser = async(req, res) => {
+const EditUser = async(req, res) => {
     const { id } = req.params
     const { name, email, password, department, position, manager } = req.body
     try {
@@ -81,13 +81,24 @@ const editUser = async(req, res) => {
     }
 }
 
+const AssignTask = async(req, res) => {
+    try {
+        console.log(req.body);
+        res.send("Task assigned successfully")
+        
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+}
+
 
 
 module.exports = {
     AdminLogin,
     CreateUser,
-    showUsers,
-    deleteUser,
-    fetchUser,
-    editUser
+    ShowUsers,
+    DeleteUser,
+    FetchUser,
+    EditUser,
+    AssignTask
 }

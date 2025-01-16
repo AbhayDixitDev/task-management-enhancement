@@ -27,7 +27,7 @@ function AdminSidebar() {
               <Nav.Link as={Link} to="/admindashboard">Dashboard</Nav.Link>
               <Nav.Link as={Link} to="/admindashboard/createuser">Create User</Nav.Link>
               <Nav.Link as={Link} to="/admindashboard/showusers">Show Users</Nav.Link>
-              <Nav.Link as={Link} to="/admindashboard/createtask">Create Task</Nav.Link>
+              <Nav.Link as={Link} to="/admindashboard/assigntask">Assign Task</Nav.Link>
               <Nav.Link as={Link} to="/admindashboard/showtasks">Show Tasks</Nav.Link>
             </Nav>
           </ul>

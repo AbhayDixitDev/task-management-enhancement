@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState , useEffect} from 'react'
 import { Table, Button, Modal, Form } from 'react-bootstrap'
 import axios from 'axios'
 
 const AssignTask = () => {
   const [users, setUsers] = useState([])
   const [show, setShow] = useState(false)
+  const [selectedFile, setSelectedFile]= useState(null);
   const [task, setTask] = useState({
     subject: '',
     description: '',
-    files: [],
-    dueDate: ''
+    dueDate: '',
+    userId: ''
   })
+
+  const handleFileChange=(e)=>{
+    setSelectedFile(e.target.files[0]);
+}
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -23,13 +28,30 @@ const AssignTask = () => {
   const handleShow = () => setShow(true)
   const handleClose = () => setShow(false)
 
+ 
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const res = await axios.post(
-      'http://localhost:8000/admin/assignTask',
-      { ...task, userId: e.target.elements.userId.value }
-    )
-    alert(res.data.message)
+    if (!selectedFile) {
+      alert('Please upload a file')
+      return
+    }
+    const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append('upload_preset', 's7oqfqa0');
+        formData.append('cloud_name', 'abhaydixitdev');
+        const response = await axios.post('https://api.cloudinary.com/v1_1/abhaydixitdev/image/upload', formData, {
+          headers: {
+              'Content-Type': 'multipart/form-data', // Set the content type
+          },
+      });
+        console.log(response.data.url);
+        const myimg=response.data.url;
+    const res = await axios.post('http://localhost:8000/admin/assignTask', {
+      ...task,
+      file: myimg
+    })
+    console.log(res)
     handleClose()
   }
 
@@ -41,6 +63,8 @@ const AssignTask = () => {
             <th>#</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Department</th>
+            <th>Position</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -50,8 +74,16 @@ const AssignTask = () => {
               <td>{index + 1}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
+              <td>{user.department}</td>
+              <td>{user.position}</td>
               <td>
-                <Button variant="primary" onClick={handleShow}>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setShow(true)
+                    setTask({ ...task, userId: user._id })
+                  }}
+                >
                   Assign Task
                 </Button>
               </td>
@@ -72,7 +104,9 @@ const AssignTask = () => {
                 type="text"
                 placeholder="Enter subject"
                 value={task.subject}
-                onChange={(e) => setTask({ ...task, subject: e.target.value })}
+                onChange={(e) =>
+                  setTask({ ...task, subject: e.target.value })
+                }
               />
             </Form.Group>
 
@@ -92,13 +126,8 @@ const AssignTask = () => {
               <Form.Label>Files</Form.Label>
               <Form.Control
                 type="file"
-                multiple
-                onChange={(e) =>
-                  setTask({
-                    ...task,
-                    files: Array.from(e.target.files)
-                  })
-                }
+                name="file"
+                onChange={handleFileChange}
               />
             </Form.Group>
 
@@ -107,23 +136,10 @@ const AssignTask = () => {
               <Form.Control
                 type="date"
                 value={task.dueDate}
-                onChange={(e) => setTask({ ...task, dueDate: e.target.value })}
+                onChange={(e) =>
+                  setTask({ ...task, dueDate: e.target.value })
+                }
               />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Assign to</Form.Label>
-              <Form.Select
-                name="userId"
-                required
-              >
-                <option value="">Select User</option>
-                {users.map((user) => (
-                  <option key={user._id} value={user._id}>
-                    {user.name}
-                  </option>
-                ))}
-              </Form.Select>
             </Form.Group>
 
             <Button variant="primary" type="submit">
