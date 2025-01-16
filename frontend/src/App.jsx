@@ -8,6 +8,7 @@ import CreateUser from './pages/adminPages/CreateUser'
 import AssignTask from './pages/adminPages/AssignTask'
 import ShowTasks from './pages/adminPages/ShowTasks'
 import ShowUsers from './pages/adminPages/ShowUsers'
+import EditUser from './pages/adminPages/EditUser'
 const App = () => {
   // const navigate = useNavigate()
  
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="showusers" element={<ShowUsers/>}/>
         <Route path="assigntask" element={<AssignTask/>}/>
         <Route path='showtasks' element={<ShowTasks/>}/>
+        <Route path="edituser/:id" element={<EditUser/>}/>
         </Route>
         <Route path="/userdashboard" element={<UserDashboard />} />
       </Route>
