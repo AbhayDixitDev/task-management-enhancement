@@ -110,7 +110,7 @@ const AssignTask = async (req, res) => {
             return res.status(400).json({ message: "File is required" });
         }
 
-        const { subject, description, dueDate, userId } = req.body;
+        const { subject, description, dueDate, userid } = req.body;
 
     
         const fileMetadata = {
@@ -139,7 +139,7 @@ const AssignTask = async (req, res) => {
             },
         });
 
-        const publicUrl = `https://drive.google.com/uc?id=${fileId}`;
+        const publicUrl = `https://drive.google.com/file/d/${fileId}/preview`;
   
         
 
@@ -148,7 +148,7 @@ const AssignTask = async (req, res) => {
             subject,
             description,
             dueDate,
-            userId,
+            userId: userid,
             file: publicUrl,
             status: "pending"
         });
@@ -163,6 +163,42 @@ const AssignTask = async (req, res) => {
     }
 }
 
+const ShowTasks = async(req, res) => {
+    try {
+        const tasks = await TaskModel.find().populate('userId');
+        res.status(200).json({ message: "Tasks fetched successfully", tasks })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+}
+
+const DeleteTask = async (req, res) => {
+    try {
+        const { id } = req.params
+        // console.log(id);
+        
+        const res = await TaskModel.findByIdAndDelete(id)
+        // console.log(res);
+        
+        res.status(200).json({ message: "Task deleted successfully" })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+}
+
+const UpdateTaskStatus = async (req, res) => {
+    try {
+        const { id } = req.params
+        const { status } = req.body
+        const task = await TaskModel.findByIdAndUpdate(id, { status })
+        console.log(task);
+        
+        res.status(200).json({ message: "Task status updated successfully" })
+    } catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+}
+
 
 module.exports = {
     AdminLogin,
@@ -171,5 +207,8 @@ module.exports = {
     DeleteUser,
     FetchUser,
     EditUser,
-    AssignTask
+    AssignTask,
+    ShowTasks,
+    DeleteTask,
+    UpdateTaskStatus
 }

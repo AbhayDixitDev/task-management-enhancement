@@ -9,5 +9,9 @@ router.get("/showUsers", adminController.ShowUsers);
 router.delete("/deleteUser /:id", adminController.DeleteUser );
 router.get("/fetchUser /:id", adminController.FetchUser );
 router.put("/editUser /:id", adminController.EditUser );
+router.get("/showTasks", adminController.ShowTasks);
 router.post("/assignTask", upload.single('file'), adminController.AssignTask);
+router.delete("/deleteTask/:id", adminController.DeleteTask);
+router.put("/updateTaskStatus/:id", adminController.UpdateTaskStatus);
+
 module.exports = router;

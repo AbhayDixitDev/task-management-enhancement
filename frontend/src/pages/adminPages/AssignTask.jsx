@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Table, Button, Modal, Form } from 'react-bootstrap';
+
 
 const AssignTask = () => {
   const [users, setUsers] = useState([]);
@@ -64,7 +66,7 @@ const AssignTask = () => {
 
   return (
     <>
-      <table>
+      <Table striped bordered hover>
         <thead>
           <tr>
             <th>#</th>
@@ -84,60 +86,78 @@ const AssignTask = () => {
               <td>{user.department}</td>
               <td>{user.position}</td>
               <td>
-                <button
+                <Button
+                  variant="primary"
                   onClick={() => {
                     setShow(true);
                     setUserid(user._id);
                   }}
                 >
                   Assign Task
-                </button>
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
 
-      {show && (
-        <form onSubmit={handleSubmit}>
-          <label>
-            Subject:
-            <input
-              name="subject"
-              type="text"
-              value={formData.subject}
-              onChange={handleInputChange}
-            />
-          </label>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Assign Task</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="subject">
+              <Form.Label>Subject</Form.Label>
+              <Form.Control
+                type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
 
-          <label>
-            Description:
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-            />
-          </label>
+            <Form.Group controlId="description">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
 
-          <label>
-            Files:
-            <input name="file" type="file" onChange={handleFileChange} />
-          </label>
+            <Form.Group controlId="file">
+              <Form.Label>Files</Form.Label>
+              <Form.Control
+                type="file"
+                name="file"
+                onChange={handleFileChange}
+              />
+            </Form.Group>
 
-          <label>
-            Due Date:
-            <input
-              name="dueDate"
-              type="date"
-              value={formData.dueDate}
-              onChange={handleInputChange}
-            />
-          </label>
+            <Form.Group controlId="dueDate">
+              <Form.Label>Due Date</Form.Label>
+              <Form.Control
+                type="date"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
 
-          <button type="submit">Assign Task</button>
-        </form>
-      )}
-    </>
+            <Button variant="primary" type="submit">
+              Assign Task
+            </Button>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      </>
   );
 };
 
