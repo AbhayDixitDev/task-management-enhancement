@@ -1,4 +1,11 @@
 const Employee = require("../models/employeeModel")
+const fs = require('fs');
+const TaskModel = require('../models/taskModel'); 
+const { google } = require('googleapis');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 
 const AdminLogin = async(req, res) => {
     const { email, password } = req.body
@@ -81,16 +88,80 @@ const EditUser = async(req, res) => {
     }
 }
 
-const AssignTask = async(req, res) => {
+
+const clientId = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
+const redirectUri = process.env.REDIRECT_URI;
+
+const oAuth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
+
+oAuth2Client.setCredentials({
+    refresh_token: process.env.REFRESH_TOKEN 
+});
+
+const drive = google.drive({ version: 'v3', auth: oAuth2Client });
+
+const AssignTask = async (req, res) => {
+    console.log(req.body);
+    console.log(req.file);
+
     try {
-        console.log(req.body);
-        res.send("Task assigned successfully")
+        if (!req.file) {
+            return res.status(400).json({ message: "File is required" });
+        }
+
+        const { subject, description, dueDate, userId } = req.body;
+
+    
+        const fileMetadata = {
+            name: req.file.originalname,
+            mimeType: req.file.mimetype,
+        };
+        const media = {
+            mimeType: req.file.mimetype,
+            body: fs.createReadStream(req.file.path),
+        };
+
+        const driveResponse = await drive.files.create({
+            resource: fileMetadata,
+            media: media,
+            fields: 'id',
+        });
+
+        const fileId = driveResponse.data.id;
+        console.log("Uploaded File ID:", fileId);
+
+        await drive.permissions.create({
+            fileId: fileId,
+            resource: {
+                role: 'reader',
+                type: 'anyone',
+            },
+        });
+
+        const publicUrl = `https://drive.google.com/uc?id=${fileId}`;
+  
         
+
+        // Create task in the database
+        const task = await TaskModel.create({
+            subject,
+            description,
+            dueDate,
+            userId,
+            file: publicUrl,
+            status: "pending"
+        });
+
+  
+        fs.unlinkSync(req.file.path);
+
+        res.status(201).json({ message: "Task assigned successfully", task });
     } catch (error) {
-        res.status(404).json({ message: error.message })
+        console.error("Error assigning task:", error);
+        res.status(500).json({ message: error.message });
     }
 }
-
 
 
 module.exports = {

@@ -1,63 +1,70 @@
-import React, { useState , useEffect} from 'react'
-import { Table, Button, Modal, Form } from 'react-bootstrap'
-import axios from 'axios'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const AssignTask = () => {
-  const [users, setUsers] = useState([])
-  const [show, setShow] = useState(false)
-  const [selectedFile, setSelectedFile]= useState(null);
-  const [task, setTask] = useState({
+  const [users, setUsers] = useState([]);
+  const [userid, setUserid] = useState('');
+  const [show, setShow] = useState(false);
+  const [file, setFile] = useState(null);
+  const [formData, setFormData] = useState({
     subject: '',
     description: '',
     dueDate: '',
-    userId: ''
-  })
+  });
 
-  const handleFileChange=(e)=>{
-    setSelectedFile(e.target.files[0]);
-}
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await axios.get('http://localhost:8000/admin/showUsers')
-      setUsers(res.data.users.filter((user) => !user.isAdmin))
-    }
-    fetchUsers()
-  }, [])
+      const res = await axios.get('http://localhost:8000/admin/showUsers');
+      setUsers(res.data.users.filter((user) => !user.isAdmin));
+    };
+    fetchUsers();
+  }, []);
 
-  const handleShow = () => setShow(true)
-  const handleClose = () => setShow(false)
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
 
- 
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!selectedFile) {
-      alert('Please upload a file')
-      return
+    e.preventDefault(); // Prevent default form submission
+
+    const data = new FormData();
+    data.append('subject', formData.subject);
+    data.append('description', formData.description);
+    data.append('dueDate', formData.dueDate);
+    data.append('userid', userid);
+
+    // Append the file
+    if (file) {
+      data.append('file', file);
     }
-    const formData = new FormData();
-        formData.append("file", selectedFile);
-        formData.append('upload_preset', 's7oqfqa0');
-        formData.append('cloud_name', 'abhaydixitdev');
-        const response = await axios.post('https://api.cloudinary.com/v1_1/abhaydixitdev/image/upload', formData, {
-          headers: {
-              'Content-Type': 'multipart/form-data', // Set the content type
-          },
+
+    try {
+      const response = await axios.post('http://localhost:8000/admin/assignTask', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-        console.log(response.data.url);
-        const myimg=response.data.url;
-    const res = await axios.post('http://localhost:8000/admin/assignTask', {
-      ...task,
-      file: myimg
-    })
-    console.log(res)
-    handleClose()
-  }
+      console.log(response.data);
+      // Optionally reset the form or close the modal
+      setShow(false);
+      setFormData({ subject: '', description: '', dueDate: '' });
+      setFile(null);
+    } catch (error) {
+      console.error('Error uploading file and data:', error);
+    }
+  };
 
   return (
     <>
-      <Table striped bordered hover>
+      <table>
         <thead>
           <tr>
             <th>#</th>
@@ -77,79 +84,61 @@ const AssignTask = () => {
               <td>{user.department}</td>
               <td>{user.position}</td>
               <td>
-                <Button
-                  variant="primary"
+                <button
                   onClick={() => {
-                    setShow(true)
-                    setTask({ ...task, userId: user._id })
+                    setShow(true);
+                    setUserid(user._id);
                   }}
                 >
                   Assign Task
-                </Button>
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
-      </Table>
+      </table>
 
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Assign Task</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Subject</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter subject"
-                value={task.subject}
-                onChange={(e) =>
-                  setTask({ ...task, subject: e.target.value })
-                }
-              />
-            </Form.Group>
+      {show && (
+        <form onSubmit={handleSubmit}>
+          <label>
+            Subject:
+            <input
+              name="subject"
+              type="text"
+              value={formData.subject}
+              onChange={handleInputChange}
+            />
+          </label>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Description</Form.Label>
-              <Form.Control
-                as="textarea"
-                placeholder="Enter description"
-                value={task.description}
-                onChange={(e) =>
-                  setTask({ ...task, description: e.target.value })
-                }
-              />
-            </Form.Group>
+          <label>
+            Description:
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+            />
+          </label>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Files</Form.Label>
-              <Form.Control
-                type="file"
-                name="file"
-                onChange={handleFileChange}
-              />
-            </Form.Group>
+          <label>
+            Files:
+            <input name="file" type="file" onChange={handleFileChange} />
+          </label>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Due Date</Form.Label>
-              <Form.Control
-                type="date"
-                value={task.dueDate}
-                onChange={(e) =>
-                  setTask({ ...task, dueDate: e.target.value })
-                }
-              />
-            </Form.Group>
+          <label>
+            Due Date:
+            <input
+              name="dueDate"
+              type="date"
+              value={formData.dueDate}
+              onChange={handleInputChange}
+            />
+          </label>
 
-            <Button variant="primary" type="submit">
-              Assign Task
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
+          <button type="submit">Assign Task</button>
+        </form>
+      )}
     </>
-  )
-}
+  );
+};
 
-export default AssignTask
+export default AssignTask;
