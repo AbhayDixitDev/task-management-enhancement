@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const adminController = require("../controllers/adminController");
-const upload = require('../storage'); 
+const upload = require('../utils/storage'); 
 
 
 router.post("/createUser ", adminController.CreateUser );

@@ -1,5 +1,3 @@
-const express = require('express');
-const router = express.Router();
 const { google } = require('googleapis');
 
 const clientId = process.env.CLIENT_ID;
@@ -13,11 +11,11 @@ const authUrl = oAuth2Client.generateAuthUrl({
     scope: ['https://www.googleapis.com/auth/drive.file'],
 });
 
-router.get('/auth/google', (req, res) => {
+const authGoogle = (req, res) => {
     res.redirect(authUrl);
-});
+}
 
-router.get('/auth/google/callback', async (req, res) => {
+const authGoogleCallback = async (req, res) => {
     const { code } = req.query;
 
     try {
@@ -31,9 +29,10 @@ router.get('/auth/google/callback', async (req, res) => {
         console.error('Error retrieving access token', error);
         res.status(500).send('Authentication failed.');
     }
-});
-
+}
 
 module.exports ={
-    authUrl
+    authUrl,
+    authGoogle,
+    authGoogleCallback
 }

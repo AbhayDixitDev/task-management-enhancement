@@ -22,33 +22,17 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "X-HTTP-Method-Override", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Access-Control-Allow-Methods", "Access-Control-Allow-Credentials"]
 }))
 
-app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true })); 
 
 
-const {authUrl} = require("./routes/googleRefreshToken")
+const {authGoogle} = require("./utils/googleRefreshToken")
+const {authGoogleCallback} = require("./utils/googleRefreshToken")
+
+app.get('/auth/google',authGoogle) ;
 
 
-app.get('/auth/google', (req, res) => {
-    res.redirect(authUrl);
-});
-
-
-app.get('/auth/google/callback', async (req, res) => {
-    const { code } = req.query;
-
-    try {
-        const { tokens } = await oAuth2Client.getToken(code);
-        oAuth2Client.setCredentials(tokens);
-
-        // Save the refresh token securely
-        console.log('Refresh Token:', tokens.refresh_token);
-        res.send('Authentication successful! You can close this tab.');
-    } catch (error) {
-        console.error('Error retrieving access token', error);
-        res.status(500).send('Authentication failed.');
-    }
-});-
+app.get('/auth/google/callback', authGoogleCallback );-
 
 app.get("/", (req, res) => {
     res.send("Hello World!")
