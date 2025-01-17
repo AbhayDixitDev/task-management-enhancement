@@ -7,7 +7,7 @@ const AssignTask = () => {
   const [users, setUsers] = useState([]);
   const [userid, setUserid] = useState('');
   const [show, setShow] = useState(false);
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     subject: '',
     description: '',
@@ -31,7 +31,8 @@ const AssignTask = () => {
   const handleClose = () => setShow(false);
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    console.log(e.target.files);
+    setFiles(e.target.files);
   };
 
   const handleSubmit = async (e) => {
@@ -44,9 +45,12 @@ const AssignTask = () => {
     data.append('userid', userid);
 
     // Append the file
-    if (file) {
-      data.append('file', file);
-    }
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+          data.append('files', files[i]); // Append each file
+      }
+  }
+  console.log(data.getAll('files')); 
 
     try {
       const response = await axios.post('http://localhost:8000/admin/assignTask', data, {
@@ -58,7 +62,7 @@ const AssignTask = () => {
       // Optionally reset the form or close the modal
       setShow(false);
       setFormData({ subject: '', description: '', dueDate: '' });
-      setFile(null);
+      setFiles(null);
     } catch (error) {
       console.error('Error uploading file and data:', error);
     }
@@ -132,6 +136,7 @@ const AssignTask = () => {
               <Form.Control
                 type="file"
                 name="file"
+                multiple
                 onChange={handleFileChange}
               />
             </Form.Group>

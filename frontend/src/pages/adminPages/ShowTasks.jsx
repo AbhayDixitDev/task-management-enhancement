@@ -95,7 +95,10 @@ const ShowTasks = () => {
         }
           
         </td>
-        <td style={{color:"black",fontSize:"1.5rem",textDecoration:"none"}}><a href={task.file} target="_blank" onMouseOver={(e)=>{e.target.style.color="blue"}} onMouseOut={(e)=>{e.target.style.color="black"}}><IoDocumentAttach/></a></td>
+        <td  style={{color:"black",fontSize:"2rem",textDecoration:"none"}}> {task.file.map((file)=>{return(
+          <a href={file} target="_blank" rel="noopener noreferrer" onMouseOver={(e)=>{e.target.style.color="blue"}} onMouseOut={(e)=>{e.target.style.color="black"}}><IoDocumentAttach/></a>
+        )})} </td>
+        
         <td>{task.status}</td>
         <td >
         <Button className='btn btn-success' style={{width:"70%",margin:"10px"}} onClick={() => setShowUpdateModal(true)}>Update Status</Button>
@@ -144,7 +147,7 @@ const ShowTasks = () => {
             <th>Subject & Description</th>
             <th>Assigned To</th>
             <th>Due Date</th>
-            <th>File</th>
+            <th>Attachments</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>

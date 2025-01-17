@@ -18,7 +18,7 @@ const taskSchema = mongoose.Schema({
         ref: 'Employee'
     },
     file: {
-        type:String,
+        type:[],
         // required: true
     },
     status: {

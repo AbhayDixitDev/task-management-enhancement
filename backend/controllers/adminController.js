@@ -100,61 +100,61 @@ oAuth2Client.setCredentials({
 });
 
 const drive = google.drive({ version: 'v3', auth: oAuth2Client });
-
 const AssignTask = async (req, res) => {
-    console.log(req.body);
-    console.log(req.file);
+    //console.log(req.body);
+    //console.log(req.files); // Change to req.files for multiple files
 
     try {
-        if (!req.file) {
-            return res.status(400).json({ message: "File is required" });
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ message: "At least one file is required" });
         }
 
         const { subject, description, dueDate, userid } = req.body;
+        const fileLinks = []; // Array to hold the links of uploaded files
 
-    
-        const fileMetadata = {
-            name: req.file.originalname,
-            mimeType: req.file.mimetype,
-        };
-        const media = {
-            mimeType: req.file.mimetype,
-            body: fs.createReadStream(req.file.path),
-        };
+        for (const file of req.files) {
+            const fileMetadata = {
+                name: file.originalname,
+                mimeType: file.mimetype,
+            };
+            const media = {
+                mimeType: file.mimetype,
+                body: fs.createReadStream(file.path),
+            };
 
-        const driveResponse = await drive.files.create({
-            resource: fileMetadata,
-            media: media,
-            fields: 'id',
-        });
+            const driveResponse = await drive.files.create({
+                resource: fileMetadata,
+                media: media,
+                fields: 'id',
+            });
 
-        const fileId = driveResponse.data.id;
-        console.log("Uploaded File ID:", fileId);
+            const fileId = driveResponse.data.id;
+            console.log("Uploaded File ID:", fileId);
 
-        await drive.permissions.create({
-            fileId: fileId,
-            resource: {
-                role: 'reader',
-                type: 'anyone',
-            },
-        });
+            await drive.permissions.create({
+                fileId: fileId,
+                resource: {
+                    role: 'reader',
+                    type: 'anyone',
+                },
+            });
 
-        const publicUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-  
-        
+            const publicUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+            fileLinks.push(publicUrl); // Add the link to the array
+            // console.log(fileLinks);
+            
+            fs.unlinkSync(file.path); // Delete the file after upload
+        }
 
-        // Create task in the database
+        // Create task in the database with all file links
         const task = await TaskModel.create({
             subject,
             description,
             dueDate,
             userId: userid,
-            file: publicUrl,
+            file: fileLinks, // Store all file links
             status: "pending"
         });
-
-  
-        fs.unlinkSync(req.file.path);
 
         res.status(201).json({ message: "Task assigned successfully", task });
     } catch (error) {
