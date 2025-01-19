@@ -43,6 +43,8 @@ const TaskReports = () => {
         try {
             const res = await axios.put(`http://localhost:8000/admin/updateTaskStatus/${id}`, { status })
             setStatus('')
+            setShowStatus(false)
+            window.location.reload()
             alert(res.data.message)
         } catch (error) {
             console.log(error)

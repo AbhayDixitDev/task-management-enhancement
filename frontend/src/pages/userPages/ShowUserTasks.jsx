@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Table, Form, Button, Modal } from 'react-bootstrap'
 import axios from 'axios'
-import { IoDocumentAttach } from "react-icons/io5";
+import { IoDocumentAttach,IoDocumentAttachOutline } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom';
 
 
@@ -15,12 +15,12 @@ const ShowUserTasks = () => {
   const navigate = useNavigate()
 
   const loadTasks = async () => {
-    console.log(userId);
+    // console.log(userId);
     
     try {
       const res = await axios.post('http://localhost:8000/user/showUserTasks',{userId:`${userId}`})
       setTasks(res.data.tasks)
-      console.log(res.data);
+    //   console.log(res.data);
 
     } catch (error) {
       console.log(error);
@@ -35,7 +35,7 @@ const ShowUserTasks = () => {
 
   useEffect(() => {
     loadTasks()
-    console.log(report);
+    // console.log(report);
     
   }, [report])
 
@@ -72,9 +72,9 @@ const ShowUserTasks = () => {
   const ans = tasks.map((task, index) => {
     return (
       <tr key={task._id}>
-        <td>{index + 1}</td>
-        <td width={"20%"}>{task.subject} </td>
-        <td> {task.description} </td>
+        <td >{index + 1}</td>
+        <td style={{ width:"200px" }}>{task.subject} </td>
+        <td style={{whiteSpace: "pre-wrap",maxWidth: "250px"}}> {task.description} </td>
 
         <td>
           {new Date(task.dueDate).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" })}
@@ -101,11 +101,12 @@ const ShowUserTasks = () => {
         </td>
         <td style={{ color: "black", fontSize: "2rem", textDecoration: "none" }}> {task.file.map((file) => {
           return (
-            <a href={file} target="_blank" rel="noopener noreferrer" onMouseOver={(e) => { e.target.style.color = "blue" }} onMouseOut={(e) => { e.target.style.color = "black" }}><IoDocumentAttach /></a>
+            <a key={file} href={file} target="_blank" rel="noopener noreferrer" onMouseOver={(e) => { e.target.style.color = "blue" }} onMouseOut={(e) => { e.target.style.color = "black" }}><IoDocumentAttach /></a>
           )
         })} </td>
 
         <td>{task.status}</td>
+        <td><a onClick={() => {navigate(`/userdashboard/usertaskreports/${task._id}`)}} target="_blank" rel="noopener noreferrer" style={{cursor:"pointer"}} onMouseOver={(e) => { e.target.style.color = "blue" }} onMouseOut={(e) => { e.target.style.color = "black" }}><IoDocumentAttachOutline style={{ color: "black", fontSize: "2rem", textDecoration: "none" , maxWidth:"50px"}}/><b> See Reports</b> </a></td>
         
         <td >
           <Button className='btn btn-success' style={{ width: "70%", margin: "10px" }} onClick={() => { setReport({ taskId: task._id, description: '', files: [],status:task.status }); handleShow() }}>Submit Task Report</Button>
@@ -129,7 +130,8 @@ const ShowUserTasks = () => {
             <th>Due Date</th>
             <th>Attachments</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th>Reports</th>
+            <th>Submit Report</th>
           </tr>
         </thead>
         <tbody>

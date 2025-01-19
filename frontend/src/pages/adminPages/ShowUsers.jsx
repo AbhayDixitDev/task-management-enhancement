@@ -31,7 +31,7 @@ const ShowUsers = () => {
   }
 
   return (
-    <Table striped bordered hover style={{width:"80%", margin:"auto"}}>
+    <Table responsive striped bordered hover>
       <thead>
         <tr>
           <th>#</th>

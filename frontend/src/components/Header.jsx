@@ -35,7 +35,7 @@ const Header = () => {
    }
   return (
      <>
-       <Navbar expand="lg" className="bg-body-tertiary">
+       <Navbar expand="lg" className="bg-body-tertiary" style={{position: "relative",zIndex: 500,width:"100vw"}}>
       <Container>
       {isAdmin==="admin" ? <AdminSidebar/> : isAdmin==="user" ? <UserSidebar/> : ''}
         <Navbar.Brand href="#home">Task Management System</Navbar.Brand>

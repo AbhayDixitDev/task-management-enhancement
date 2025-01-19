@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import { Form, Button, Col } from 'react-bootstrap'
 import { FaLock } from 'react-icons/fa'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
 const ChangePassword = () => {
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
+
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -24,6 +27,7 @@ const ChangePassword = () => {
       alert(res.data.message)
     } catch (error) {
       alert(error.response.data.message)
+      navigate('/admindashboard')
     }
   }
 

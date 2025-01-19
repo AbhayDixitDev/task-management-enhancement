@@ -114,10 +114,122 @@ const SubmitTaskReport=async (req, res) => {
     }
 }
 
+const TaskReports = async(req,res)=>{
+    try {
+        const {id}=req.params
+        const taskReports=await TaskModel.find({_id:id}).populate('reports')
+        console.log(taskReports);
+        
+        res.status(200).json({message:"Task reports fetched successfully",taskReports})
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
+const ChangePassword = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { oldPassword, newPassword } = req.body;
+        const user = await Employee.findById(id);
+        if (user.password !== oldPassword) {
+            return res.status(400).json({ message: "Old password is incorrect" });
+        }
+        if (user.password === newPassword) {
+            return res.status(400).json({ message: "New password cannot be same as old password" });
+        }
+        await Employee.findByIdAndUpdate(id, { password: newPassword });
+
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
+
+let otpStore = {};
+
+const ResetSendOtp = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await Employee.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+        
+
+        const otp = crypto.randomInt(100000, 999999).toString();
+        otpStore[email] = otp;
+
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.sendgrid.net',
+            port: 587,
+            auth: {
+                user: 'apikey', // This is the string "apikey", literally
+                pass: process.env.SENDGRID_API_KEY, // Your SendGrid API key
+            }
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email.toLowerCase(),
+            subject: 'Password Reset OTP',
+            text: `Your OTP is ${otp}`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) return res.status(500).json({ message: 'Error sending OTP' });
+
+            res.status(200).json({ message: 'OTP sent successfully' });
+        });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+
+    }
+};
+
+const ConfirmOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        if (!otpStore[email]) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+        if (otpStore[email] !== otp) {
+            return res.status(400).json({ message: "Invalid OTP" });
+        }
+        delete otpStore[email]
+        res.status(200).json({ message: "otp verified" });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+
+    }
+};
+
+const NewPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        const user = await Employee.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+       
+        await Employee.findOneAndUpdate({ email: email.toLowerCase() }, { password: newPassword })
+        res.status(200).json({ message: "Password changed successfully" })
+    }
+    catch (error) {
+        res.status(404).json({ message: error.message })
+    }
+}
 
 
 module.exports= {
     UserLogin,
     ShowUserTasks,
-    SubmitTaskReport
+    SubmitTaskReport,
+    TaskReports,
+    ChangePassword,
+    ResetSendOtp,
+    ConfirmOtp,
+    NewPassword
 }
