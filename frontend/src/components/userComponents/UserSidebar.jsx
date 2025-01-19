@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { FaBars } from 'react-icons/fa';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Button  } from 'react-bootstrap';
-import { Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import Nav from 'react-bootstrap/Nav';
 
-const UserSidebar =()=> {
+
+function UserSidebar() {
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -18,13 +19,15 @@ const UserSidebar =()=> {
       </Button>
       <Offcanvas show={show} onHide={handleClose} scroll={true} backdrop={true} style={{ width: '200px' }}>
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Admin Sidebar</Offcanvas.Title>
+          <Offcanvas.Title>User Sidebar</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <ul>
             <Nav>
-              <Nav.Link as={Link} to="dashboard">Dashboard</Nav.Link>
-              <Nav.Link as={Link} to="showtasks">Show Tasks</Nav.Link>
+              <Nav.Link as={Link} to="/userdashboard">Dashboard</Nav.Link>
+              <Nav.Link as={Link} to="/userdashboard/showusertasks">Show Tasks</Nav.Link>
+              <Nav.Link as={Link} to="/userdashboard/changeuserpassword">Change Password</Nav.Link>
+              <Nav.Link as={Link} to="/userdashboard/resetuserpassword">Reset Password</Nav.Link>
             </Nav>
           </ul>
         </Offcanvas.Body>

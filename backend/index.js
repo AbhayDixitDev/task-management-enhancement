@@ -38,6 +38,7 @@ app.get("/", (req, res) => {
     res.send("Hello World!")
 })
 app.use("/admin", require("./routes/adminRoute"))
+app.use("/user", require("./routes/userRoute"))
 
 
 app.listen(process.env.PORT, () => {

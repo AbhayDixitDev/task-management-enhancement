@@ -4,7 +4,6 @@ import axios from 'axios'
 import { IoDocumentAttach } from "react-icons/io5";
 
 
-
 const ShowTasks = () => {
   const [tasks, setTasks] = useState([])
   const [updateStatus, setUpdateStatus] = useState('')
@@ -142,7 +141,7 @@ const ShowTasks = () => {
 
   return (
     <div>
-      <Table striped bordered hover>
+      <Table responsive striped bordered hover>
         <thead>
           <tr>
             <th>#</th>

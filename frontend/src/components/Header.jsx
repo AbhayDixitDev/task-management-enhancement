@@ -4,6 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminSidebar from './adminComponents/AdminSidebar';
+import UserSidebar from './userComponents/UserSidebar';
 const Header = () => {
   const navigate = useNavigate()
   const [isLogin, setIsLogin] = useState(false)
@@ -13,7 +14,6 @@ const Header = () => {
       const userType = localStorage.getItem('userType')
       if(!userName || !userType){
         setIsLogin(false)
-        navigate('/login')
       }
       else{
         setIsLogin(true)
@@ -37,7 +37,7 @@ const Header = () => {
      <>
        <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
-      {isAdmin==="admin" ? <AdminSidebar/> : isAdmin==="user" ? '<UserSidebar/>' : ''}
+      {isAdmin==="admin" ? <AdminSidebar/> : isAdmin==="user" ? <UserSidebar/> : ''}
         <Navbar.Brand href="#home">Task Management System</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">

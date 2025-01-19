@@ -21,6 +21,10 @@ const taskSchema = mongoose.Schema({
         type:[],
         // required: true
     },
+    reports: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Report'
+    }],
     status: {
         type: String,
         required: true,
@@ -31,3 +35,7 @@ const taskSchema = mongoose.Schema({
 })
 
 module.exports = mongoose.model('Task', taskSchema)
+
+
+
+
