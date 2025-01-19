@@ -1,5 +1,6 @@
 const Employee = require("../models/employeeModel");
 const TaskModel = require('../models/taskModel'); 
+const ReportModel = require('../models/reportModel');
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -181,6 +182,11 @@ const UpdateTaskStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
+        console.log(status);
+        if (status=="") {
+            return res.status(400).json({ message: "Invalid status" });
+        }
+        
         const task = await TaskModel.findByIdAndUpdate(id, { status });
 
         res.status(200).json({ message: "Task status updated successfully" });
@@ -286,10 +292,36 @@ const NewPassword = async (req, res) => {
     }
     catch (error) {
         res.status(404).json({ message: error.message })
-     
-        
     }
 }
+
+const TaskReports = async(req,res)=>{
+    try {
+        const {id}=req.params
+        const taskReports=await TaskModel.find({_id:id}).populate('reports')
+        console.log(taskReports);
+        
+        res.status(200).json({message:"Task reports fetched successfully",taskReports})
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
+const Feedback=async(req,res)=>{
+    try {
+        const {id}=req.params
+        const {feedback}= req.body
+        const taskReports=await ReportModel.updateOne({_id:id},{feedback:feedback})
+        console.log(taskReports);
+        
+        
+        
+        res.status(200).json({message:"Task reports fetched successfully",taskReports})
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
 module.exports = {
     AdminLogin,
     CreateUser,
@@ -304,5 +336,7 @@ module.exports = {
     ChangePassword,
     ResetSendOtp,
     ConfirmOtp,
-    NewPassword
+    NewPassword,
+    TaskReports,
+    Feedback
 }

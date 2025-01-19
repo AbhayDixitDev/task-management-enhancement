@@ -14,6 +14,7 @@ import ResetPassword from './pages/adminPages/ResetPassword'
 import ShowUserTasks from './pages/userPages/ShowUserTasks'
 import ChangeUserPassword from './pages/userPages/ChangeUserPassword'
 import ResetUserPassword from './pages/userPages/ResetUserPassword'
+import TaskReports from './pages/adminPages/TaskReports'
 const App = () => {
   // const navigate = useNavigate()
  
@@ -35,6 +36,8 @@ const App = () => {
           <Route path="edituser/:id" element={<EditUser/>}/>
           <Route path="changepassword" element={<ChangePassword/>}/>
           <Route path="resetpassword" element={<ResetPassword/>}/>
+          <Route path="taskreports/:id" element={<TaskReports/>}/>
+
         </Route>
         <Route path="/userdashboard" element={<UserDashboard />} >
           <Route index element={<ShowUserTasks/>} />

@@ -62,8 +62,9 @@ const SubmitTaskReport=async (req, res) => {
         // console.log(req.body);
         // console.log(req.files);
         
-        const { description, taskId, files,status } = req.body;
-
+        const { description, taskid, files,status } = req.body;
+       console.log(req.body);
+       
         const fileLinks = [];
 
         for (const file of req.files) {
@@ -98,10 +99,14 @@ const SubmitTaskReport=async (req, res) => {
             fs.unlinkSync(file.path);
         }
 
-        const report = await ReportModel.create({ description, taskId, reportFiles: fileLinks, status });
+        const report = await ReportModel.create({ description, task:taskid, reportFiles: fileLinks, status });
+        console.log(report);
+        
 
-        await TaskModel.findByIdAndUpdate(taskId, { $push: { reports: report._id } });
+        const task = await TaskModel.findByIdAndUpdate(taskid, { $push: { reports: report._id } });
         // console.log(fileLinks);
+        console.log(task);
+        
         
         res.status(200).json({ report, message: "Report submitted successfully" });
     } catch (error) {

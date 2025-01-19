@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { Table, Form, Button, Modal } from 'react-bootstrap'
 import axios from 'axios'
 import { IoDocumentAttach } from "react-icons/io5";
+import { IoDocumentAttachOutline } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
+
 
 
 const ShowTasks = () => {
@@ -9,6 +12,8 @@ const ShowTasks = () => {
   const [updateStatus, setUpdateStatus] = useState('')
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
+
+  const navigate = useNavigate()
 
   const loadTasks = async () => {
     try {
@@ -94,13 +99,14 @@ const ShowTasks = () => {
           }
 
         </td>
-        <td style={{ color: "black", fontSize: "2rem", textDecoration: "none" }}> {task.file.map((file) => {
+        <td style={{ color: "black", fontSize: "2rem", textDecoration: "none" , maxWidth:"100px"}}> {task.file.map((file) => {
           return (
             <a href={file} target="_blank" rel="noopener noreferrer" onMouseOver={(e) => { e.target.style.color = "blue" }} onMouseOut={(e) => { e.target.style.color = "black" }}><IoDocumentAttach /></a>
           )
         })} </td>
 
         <td>{task.status}</td>
+        <td><a onClick={() => {navigate(`/admindashboard/taskReports/${task._id}`)}} target="_blank" rel="noopener noreferrer" style={{cursor:"pointer"}} onMouseOver={(e) => { e.target.style.color = "blue" }} onMouseOut={(e) => { e.target.style.color = "black" }}><IoDocumentAttachOutline style={{ color: "black", fontSize: "2rem", textDecoration: "none" , maxWidth:"50px"}}/><b> See Reports</b> </a></td>
         <td >
           <Button className='btn btn-success' style={{ width: "70%", margin: "10px" }} onClick={() => setShowUpdateModal(true)}>Update Status</Button>
           <Button className='btn btn-danger' style={{ width: "70%", margin: "10px" }} onClick={() => DeleteTask(task._id)}>Delete Task</Button>
@@ -150,6 +156,7 @@ const ShowTasks = () => {
             <th>Due Date</th>
             <th>Attachments</th>
             <th>Status</th>
+            <th>Updates</th>
             <th>Actions</th>
           </tr>
         </thead>

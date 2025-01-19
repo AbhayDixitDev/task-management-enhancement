@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Table, Form, Button, Modal } from 'react-bootstrap'
 import axios from 'axios'
 import { IoDocumentAttach } from "react-icons/io5";
+import { useNavigate } from 'react-router-dom';
 
 
 const ShowUserTasks = () => {
@@ -10,6 +11,8 @@ const ShowUserTasks = () => {
   const [showReportModal, setShowReportModal] = useState(false)
   const [report, setReport] = useState({ description: '', files: [], taskId: '', status: '' })
   const [files, setFiles] = useState([]);
+
+  const navigate = useNavigate()
 
   const loadTasks = async () => {
     console.log(userId);
@@ -103,6 +106,7 @@ const ShowUserTasks = () => {
         })} </td>
 
         <td>{task.status}</td>
+        
         <td >
           <Button className='btn btn-success' style={{ width: "70%", margin: "10px" }} onClick={() => { setReport({ taskId: task._id, description: '', files: [],status:task.status }); handleShow() }}>Submit Task Report</Button>
 

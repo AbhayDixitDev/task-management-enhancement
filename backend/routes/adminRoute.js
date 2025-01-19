@@ -17,5 +17,7 @@ router.put("/changePassword/:id", adminController.ChangePassword);
 router.post("/resetPassword/sendOtp", adminController.ResetSendOtp);
 router.post("/resetPassword/confirmOtp", adminController.ConfirmOtp);
 router.post("/resetPassword/newPassword", adminController.NewPassword);
+router.get("/taskReports/:id", adminController.TaskReports);
+router.put("/feedback/:id", adminController.Feedback);
 
 module.exports = router;
