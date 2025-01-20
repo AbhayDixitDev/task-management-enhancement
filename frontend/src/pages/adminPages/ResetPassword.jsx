@@ -11,16 +11,18 @@ const ResetPassword = () => {
     const [otp, setOtp] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [userId, setUserId] = useState(localStorage.getItem('userId'));
 
     const navigate = useNavigate()
 
     const handleSendOtp = async () => {
         try {
-            const response = await axios.post('http://localhost:8000/admin/resetPassword/sendOtp', { email });
+            const response = await axios.post('http://localhost:8000/admin/resetPassword/sendOtp', { email,userId });
             setMessage(response.data.message);
             setStep(2); // Move to OTP input
         } catch (error) {
-            setMessage('Error sending OTP. Please try again.');
+            setMessage(error.response.data.message);
+
         }
     };
 
@@ -31,18 +33,19 @@ const ResetPassword = () => {
           
             setStep(3); // Move to new password input
         } catch (error) {
-            setMessage('Invalid OTP. Please try again.');
+            setMessage(error.response.data.message);
         }
     };
 
     const handleChangePassword = async () => {
         try {
-            const response = await axios.post('http://localhost:8000/admin/resetPassword/newPassword', { email, newPassword });
+            const response = await axios.post('http://localhost:8000/admin/resetPassword/newPassword', {  newPassword, userId });
             setMessage(response.data.message);
             alert(response.data.message)
             navigate("/admindashboard")
         } catch (error) {
-            setMessage('Error changing password. Please try again.');
+            setMessage(error.response.data.message);
+
         }
     };
 

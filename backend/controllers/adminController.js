@@ -1,14 +1,17 @@
 const Employee = require("../models/employeeModel");
 const TaskModel = require('../models/taskModel'); 
 const ReportModel = require('../models/reportModel');
+const crypto = require('crypto');
 
 const dotenv = require('dotenv');
 dotenv.config();
 
 const fs = require('fs');
 const { google } = require('googleapis');
-const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const sendEmail = require('../utils/sendEmailGmail');
+
+
 
 
 const AdminLogin = async (req, res) => {
@@ -214,47 +217,40 @@ const ChangePassword = async (req, res) => {
     }
 };
 
-let otpStore = {};
+const otpStore = {};
+
 
 const ResetSendOtp = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email,userId } = req.body;
+        // console.log(email);
+        
 
-        const admin = await Employee.findOne({ email: email.toLowerCase() });
+        const admin = await Employee.findOne({ _id: userId });
+        // console.log(admin);
+        
         if (!admin) {
-            return res.status(400).json({ message: "User not found" });
+            return res.status(400).json({ message: "User  not found" });
         }
         if (!admin.isAdmin) {
             return res.status(400).json({ message: "Only admins can reset passwords" });
         }
+        if(admin.email != email){
+            return res.status(400).json({ message: "Invalid email, please enter your registered email" });
+        }
 
         const otp = crypto.randomInt(100000, 999999).toString();
         otpStore[email] = otp;
+        // console.log(otp);
+        
 
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.sendgrid.net',
-            port: 587,
-            auth: {
-                user: 'apikey', // This is the string "apikey", literally
-                pass: process.env.SENDGRID_API_KEY, // Your SendGrid API key
-            }
-        });
+       const reso= await sendEmail(email.toLowerCase(), 'Password Reset OTP', `Your OTP is ${otp}`);
+    //    console.log(reso);
+       
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email.toLowerCase(),
-            subject: 'Password Reset OTP',
-            text: `Your OTP is ${otp}`
-        };
-
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) return res.status(500).json({ message: 'Error sending OTP' });
-
-            res.status(200).json({ message: 'OTP sent successfully' });
-        });
+        res.status(200).json({ message: 'OTP sent successfully' });
     } catch (error) {
         res.status(404).json({ message: error.message });
-
     }
 };
 
@@ -265,35 +261,115 @@ const ConfirmOtp = async (req, res) => {
         if (!otpStore[email]) {
             return res.status(400).json({ message: "Invalid or expired OTP" });
         }
+        console.log(otpStore);
+        
         if (otpStore[email] !== otp) {
             return res.status(400).json({ message: "Invalid OTP" });
         }
-        delete otpStore[email]
-        res.status(200).json({ message: "otp verified" });
+        delete otpStore[email];
+        res.status(200).json({ message: "OTP verified" });
     } catch (error) {
         res.status(404).json({ message: error.message });
-
     }
 };
 
 const NewPassword = async (req, res) => {
     try {
-        const { email, newPassword } = req.body;
+        const { newPassword, userId } = req.body;
 
-        const admin = await Employee.findOne({ email: email.toLowerCase() });
-        if (!admin) {
-            return res.status(400).json({ message: "User not found" });
-        }
-        if (!admin.isAdmin) {
-            return res.status(400).json({ message: "Only admins can reset passwords" });
-        }
-        await Employee.findOneAndUpdate({ email: email.toLowerCase() }, { password: newPassword })
-        res.status(200).json({ message: "Password changed successfully" })
+        await Employee.findOneAndUpdate({ _id: userId }, { password: newPassword });
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        res.status(404).json({ message: error.message });
     }
-    catch (error) {
-        res.status(404).json({ message: error.message })
-    }
-}
+};
+
+
+
+
+
+//sendGrid api mail start
+
+// let otpStore = {};
+
+// const ResetSendOtp = async (req, res) => {
+//     try {
+//         const { email } = req.body;
+
+//         const admin = await Employee.findOne({ email: email.toLowerCase() });
+//         if (!admin) {
+//             return res.status(400).json({ message: "User not found" });
+//         }
+//         if (!admin.isAdmin) {
+//             return res.status(400).json({ message: "Only admins can reset passwords" });
+//         }
+
+//         const otp = crypto.randomInt(100000, 999999).toString();
+//         otpStore[email] = otp;
+
+//         const transporter = nodemailer.createTransport({
+//             host: 'smtp.sendgrid.net',
+//             port: 587,
+//             auth: {
+//                 user: 'apikey', // This is the string "apikey", literally
+//                 pass: process.env.SENDGRID_API_KEY, // Your SendGrid API key
+//             }
+//         });
+
+//         const mailOptions = {
+//             from: process.env.EMAIL_USER,
+//             to: email.toLowerCase(),
+//             subject: 'Password Reset OTP',
+//             text: `Your OTP is ${otp}`
+//         };
+
+//         transporter.sendMail(mailOptions, (error, info) => {
+//             if (error) return res.status(500).json({ message: 'Error sending OTP' });
+
+//             res.status(200).json({ message: 'OTP sent successfully' });
+//         });
+//     } catch (error) {
+//         res.status(404).json({ message: error.message });
+
+//     }
+// };
+
+// const ConfirmOtp = async (req, res) => {
+//     try {
+//         const { email, otp } = req.body;
+
+//         if (!otpStore[email]) {
+//             return res.status(400).json({ message: "Invalid or expired OTP" });
+//         }
+//         if (otpStore[email] !== otp) {
+//             return res.status(400).json({ message: "Invalid OTP" });
+//         }
+//         delete otpStore[email]
+//         res.status(200).json({ message: "otp verified" });
+//     } catch (error) {
+//         res.status(404).json({ message: error.message });
+
+//     }
+// };
+
+// const NewPassword = async (req, res) => {
+//     try {
+//         const { email, newPassword } = req.body;
+
+//         const admin = await Employee.findOne({ email: email.toLowerCase() });
+//         if (!admin) {
+//             return res.status(400).json({ message: "User not found" });
+//         }
+//         if (!admin.isAdmin) {
+//             return res.status(400).json({ message: "Only admins can reset passwords" });
+//         }
+//         await Employee.findOneAndUpdate({ email: email.toLowerCase() }, { password: newPassword })
+//         res.status(200).json({ message: "Password changed successfully" })
+//     }
+//     catch (error) {
+//         res.status(404).json({ message: error.message })
+//     }
+// }
 
 const TaskReports = async(req,res)=>{
     try {
